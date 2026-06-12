@@ -8,6 +8,11 @@
 *.so
 *.dylib
 
+# generated grpc code / protobuf
+*.pb.go
+*.grpc.pb.go
+*._grpc.pb.go
+
 # Test binary, built with `go test -c`
 *.test
 
