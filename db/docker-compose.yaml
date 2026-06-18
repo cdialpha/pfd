@@ -4,9 +4,11 @@ services:
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_USER: pfd-db-user
-      POSTGRES_PASSWORD: pfd-db-password
-      POSTGRES_DB: pfd-db
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_pw
+    env_file:
+      - .env
+    secrets:
+      - pg_pw
     ports:
       - "5432:5432"
     volumes:
@@ -15,3 +17,6 @@ services:
 volumes:
   postgres-data:
   
+secrets :
+  pg_pw:
+    file: ./.secrets/pg_pw.txt
