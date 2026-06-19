@@ -1,0 +1,10 @@
+{{ include "account-svc.fullname" . }} deployed.
+
+gRPC service reachable in-cluster at:
+  {{ include "account-svc.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+Port-forward to test locally:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "account-svc.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+
+Then (grpcurl example):
+  grpcurl -plaintext localhost:{{ .Values.service.port }} list

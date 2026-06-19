@@ -1,0 +1,8 @@
+apiVersion: v2
+name: accounts
+description: gRPC service for user registration
+type: application
+# version  = chart version (bump on any chart change)
+# appVersion = your service's release version (informational)
+version: 0.1.0
+appVersion: "0.1.0"

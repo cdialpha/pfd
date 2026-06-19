@@ -19,4 +19,4 @@ volumes:
   
 secrets :
   pg_pw:
-    file: ./.secrets/pg_pw.txt
+    file: ./.secrets/pg_pw.txt 
