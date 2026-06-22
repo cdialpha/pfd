@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root
+  name: accounts
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io # cascade-delete children on root deletion
@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/cdialpha/pfd
     targetRevision: dev # branch | tag | commit SHA 
-    path: apps # dir holding child app YAMLs 
+    path: deploy/charts/accounts 
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
