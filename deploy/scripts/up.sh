@@ -4,6 +4,7 @@ set -eo pipefail # exit on error, and fail if any command in a pipeline fails
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
+# echo "pwd: $(pwd), script dir: $SCRIPT_DIR, project root: $PROJECT_ROOT"
 
 # env vars - load from .env or .env.example if exists, don't fail if missing
 if [[ -f .env ]]; then
@@ -50,8 +51,28 @@ kind create cluster --name "$CLUSTER_NAME" --config cluster-config.yaml
 # Wait for CTRL-P
 kubectl wait --for=condition=Ready node --all --timeout=120s
 
-# Bootstrap (CNI, storage class, etc.) 
-# kubectl apply -f manifests/bootstrap
+# Bootstrap
+
+# ArgoCD Init 
+
+# kubectl create namespace argocd || true
+# kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+# kubectl apply -f bootstrap/root-app.yaml
+
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
+kubectl apply -f bootstrap/root-app.yaml
+
+# TO DO init Network Infra 
+    # TO DO add CNI 
+    # Add API GW 
+
+
+# TO DO Helm Install Accounts Chart from 
+    # charts/accoutns? Or chart repo? 
+
+
 
 # App manifests / Helm
 # helm upgrade --install myapp ./charts/myapp

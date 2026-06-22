@@ -1,0 +1,22 @@
+apiVersion: agrgoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade-delete children on root deletion
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/cdialpha/pdf
+    targetRevision: dev # branch | tag | commit SHA 
+    path: apps # dir holding child app YAMLs 
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd  # check 
+  syncPolicy:
+    automated:
+      prune: true # allow deletion of resources
+      selfHeal: true # allow auto-sync when drift detected
+    syncOptions:
+      - CreateNamespace=true # auto-create namespace if missing
