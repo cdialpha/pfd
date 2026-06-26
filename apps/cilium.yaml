@@ -13,7 +13,7 @@ spec:
      targetRevision: 1.19.4
      helm:
        valueFiles:
-       - $values/deploy/values/cillium-values.yaml
+       - $values/deploy/values/cilium-values.yaml
   -  repoURL: https://github.com/cdialpha/pfd 
      targetRevision: dev 
      ref: values     
