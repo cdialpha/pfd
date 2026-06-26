@@ -15,8 +15,8 @@ if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.
     exit 1
   fi
 
-CP_IP=$(kubectl get node -l node-role.kubernetes.io/control-plane='' \
-       -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+# CP_IP=$(kubectl get node -l node-role.kubernetes.io/control-plane='' \
+#        -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 # TO DO: figure out how to avoid CP_IP hardcoding. 
 
@@ -27,12 +27,13 @@ helm repo update
 helm install cilium cilium/cilium \
       --namespace kube-system \
       --set kubeProxyReplacement=true \
-      --set k8sServiceHost=${CP_IP}\
+      --set k8sServiceHost=auto \
       --set k8sServicePort=6443 \
       --set l2announcements.enabled=true
 
-# kubectl wait --for=condition=Ready node --all --timeout=120s
-cilium status --wait   # or kubectl wait
+# wait on cilium agent (DS; dataplane) & operator AVAILABLE (>=1), tolerating 1/2 pending quirk:
+kubectl -n kube-system rollout status ds/cilium --timeout=300s
+kubectl -n kube-system wait deploy/cilium-operator --for=condition=Available --timeout=300s
 
 helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 kubectl apply -f bootstrap/root-app.yaml

@@ -19,7 +19,7 @@ k8sClientRateLimit:
   burst: 200
 operator:
   replicas: 1
-  rollOutPods: true
+  # rollOutPods: true
   resources:
     requests:
       cpu: 100m
