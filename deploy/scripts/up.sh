@@ -22,6 +22,7 @@ if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.
 
 helm repo add cilium https://helm.cilium.io/
 helm repo add argo https://argoproj.github.io/argo-helm
+
 helm repo update
 
 helm install cilium cilium/cilium \

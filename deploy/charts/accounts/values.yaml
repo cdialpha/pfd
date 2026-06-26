@@ -2,8 +2,8 @@
 replicaCount: 1
 
 image:
-  repository: myregistry/my-svc
-  tag: ""                    # δ to .Chart.AppVersion if empty
+  repository: ghcr.io/cdialpha/accounts
+  tag: "v1.0"                 # δ to .Chart.AppVersion if empty
   pullPolicy: IfNotPresent   # Always | IfNotPresent | Never
 
 # -- Pod-level annotations (e.g. Prometheus scrape, checksum/config)
@@ -25,7 +25,9 @@ resources:
 
 # -- Liveness/readiness probes
 probes:
-  enabled: true
+  enabled: false
+  type: grpc
+  port: 50051
   initialDelaySeconds: 10
   periodSeconds: 15
 
