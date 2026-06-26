@@ -22,6 +22,11 @@ load_env() {
 
 export CLUSTER_NAME="${CLUSTER_NAME:-dev}"
 export K8S_VERSION="${K8S_VERSION:-v1.31.0}"
+export KIND_NET="${KIND_NET:-kind}" 
+export KIND_SUBNET="${KIND_SUBNET:-172.20.0.0/16}" 
+export KIND_GW="${KIND_GW:-172.20.0.1}" 
+export CP_IP="${CP_IP:-172.20.0.2}" 
+
 set -u # enforce unset variables as an error
 
 die() { printf 'Error: %s\n' "$*" >&2; exit 1; }

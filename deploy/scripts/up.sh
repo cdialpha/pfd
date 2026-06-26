@@ -1,22 +1,34 @@
 #!/usr/bin/env bash
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh" 
-
 load_env 
 check_files 
 require kind kubectl helm cilium
 # TO DO: Require specific version minimums? 
 
+echo "NET=[$KIND_NET] SUBNET=[$KIND_SUBNET] GW=[$KIND_GW]" >&2
+
+# Ensure the docker network exists w/ pinned subnet (idempotent) 
+if ! docker network inspect "$KIND_NET" >/dev/null 2>&1; then 
+  docker network create -d bridge --subnet "$KIND_SUBNET" --gateway "$KIND_GW" "$KIND_NET" 
+else 
+  # Verify existing net matches expected subnet; fail loud if not 
+  existing=$(docker network inspect "$KIND_NET" -f '{{ (index .IPAM.Config 0).Subnet }}') 
+  if [[ "$existing" != "$KIND_SUBNET" ]]; then 
+    echo "ERROR: docker network '$KIND_NET' exists w/ subnet $existing, expected $KIND_SUBNET" >&2 
+    echo "Run: docker network rm $KIND_NET   (after deleting any kind clusters)" >&2 
+    exit 1 
+  fi 
+fi 
+ 
 # Kind Cluster
-
-
 if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.yaml; then
     echo "✗ cluster init failed" >&2
     exit 1
   fi
 
 # CP_IP=$(kubectl get node -l node-role.kubernetes.io/control-plane='' \
-#        -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+#  -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 # TO DO: figure out how to avoid CP_IP hardcoding. 
 
