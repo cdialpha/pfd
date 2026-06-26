@@ -1,0 +1,53 @@
+kubeProxyReplacement: true
+k8sServiceHost: auto
+k8sServicePort: "6443"
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - "10.244.0.0/16"   # must NOT overlap kind's serviceSubnet or host net
+    clusterPoolIPv4MaskSize: 24
+l2announcements:
+  enabled: true
+  leaseDuration: "15s"
+  leaseRenewDeadline: "5s"
+  leaseRetryPeriod: "2s"
+externalIPs:
+  enabled: true
+k8sClientRateLimit:
+  qps: 50
+  burst: 200
+operator:
+  replicas: 1
+  rollOutPods: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+rollOutCiliumPods: true
+gatewayAPI:
+  enabled: false
+ingressController:
+  enabled: false
+l7Proxy: true
+encryption:
+  enabled: true
+  type: wireguard
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+  metrics:
+    enableOpenMetrics: true
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - icmp
+      - http
+# routingMode: tunnel   # (δ) - leave unset
