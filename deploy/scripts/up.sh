@@ -34,7 +34,7 @@ if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.
 
 helm repo add cilium https://helm.cilium.io/
 helm repo add argo https://argoproj.github.io/argo-helm
-
+helm repo add jetstack https://charts.jetstack.io 
 helm repo update
 
 helm install cilium cilium/cilium \
@@ -50,6 +50,7 @@ kubectl -n kube-system wait deploy/cilium-operator --for=condition=Available --t
 
 helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 kubectl apply -f bootstrap/root-app.yaml
+
 
 # TO DO init Network Infra 
 

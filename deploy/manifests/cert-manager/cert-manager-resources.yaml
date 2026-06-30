@@ -1,0 +1,58 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-bootstrap
+  annotations: {argocd.argoproj.io/sync-wave: "0"}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cluster-ca
+  namespace: cert-manager        # Secret lands here; must be readable by the CA issuer
+  annotations: {argocd.argoproj.io/sync-wave: "1"}
+spec:
+  isCA: true
+  commonName: cluster-internal-ca
+  secretName: cluster-ca-key-pair   # <-- the Secret the CA ClusterIssuer references
+  duration: 87600h               # ~10y root
+  renewBefore: 720h
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-bootstrap   # signed by step 1
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-ca-issuer
+  annotations: {argocd.argoproj.io/sync-wave: "2"}
+spec:
+  ca:
+    secretName: cluster-ca-key-pair   # same Secret from step 2
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: api-gateway-tls
+  namespace: gateway            # wherever your GW runs
+  annotations: {argocd.argoproj.io/sync-wave: "3"}
+spec:
+  secretName: api-gateway-tls   # GW mounts/references this Secret
+  duration: 2160h               # ~90d leaf, rotates freely
+  renewBefore: 360h
+  dnsNames:
+    - api-gateway.gateway.svc           # internal svc DNS
+    - api-gateway.gateway.svc.cluster.local
+    - localhost                          # if hit locally during dev
+  ipAddresses:
+    - 127.0.0.1                          # optional, for direct IP access
+  issuerRef:
+    name: cluster-ca-issuer     # signed by step 3
+    kind: ClusterIssuer
+    group: cert-manager.io

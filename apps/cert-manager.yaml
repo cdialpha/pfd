@@ -1,34 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cilium
+  name: cert-manager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-5"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   sources:
-  -  repoURL: https://helm.cilium.io/
-     chart: cilium
-     targetRevision: 1.19.4
+  -  repoURL: https://charts.jetstack.io
+     chart: cert-manager
+     targetRevision: v1.20.3
      helm:
        valueFiles:
-       - $values/deploy/charts/cilium/cilium-values.yaml
+       - $values/deploy/charts/cert-manager/cert-manager-values.yaml
   -  repoURL: https://github.com/cdialpha/pfd 
      targetRevision: dev 
-     ref: values     
+     ref: values    
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: cert-manager
   syncPolicy:
     automated:
-      prune: true
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
-    retry:
-      limit: 10
-      backoff:
-        duration: 10s
-        factor: 2
-        maxDuration: 5m
+      - Replace=true
+      - CreateNamespace=true
