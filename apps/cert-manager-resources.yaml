@@ -10,6 +10,7 @@ spec:
   source:
     repoURL: https://github.com/cdialpha/pfd/
     path: deploy/manifests/cert-manager
+    targetRevision: dev
     directory:
       recurse: true
       # include: "*.yaml"
