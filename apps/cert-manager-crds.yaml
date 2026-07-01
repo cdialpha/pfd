@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/cdialpha/pfd
-    target: dev
+    targetRevision: dev
     path: deploy/charts/cert-manager/crds
   destination:
     server: https://kubernetes.default.svc
@@ -18,6 +18,6 @@ spec:
     automated:
       selfHeal: true
     syncOptions:
-      - ServerSideApply: true
-      - Replace: true
-      - CreateNamespace: true
+      - ServerSideApply=true
+      - Replace=true
+      - CreateNamespace=true
