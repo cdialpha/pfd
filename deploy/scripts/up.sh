@@ -52,7 +52,7 @@ helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 kubectl apply -f bootstrap/root-app.yaml
 
 
-# TO DO init Network Infra 
+# TO DO init Network Infra w/ IaC tool ? 
 
 # Add API GW 
 

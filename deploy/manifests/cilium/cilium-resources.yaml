@@ -1,0 +1,23 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: local-pool
+spec:
+  blocks:
+    - cidr: "172.18.255.0/24"   # carve from `docker network inspect kind` subnet; confirm no overlap w/ node IPs
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: local-l2-policy
+spec:
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: DoesNotExist   # optional, only matters if multi-node kind
+  interfaces:
+    - ^eth0$  # kind node container's primary iface; verify w/ `ip a` in a node
+  externalIPs: true
+  loadBalancerIPs: true
+---
