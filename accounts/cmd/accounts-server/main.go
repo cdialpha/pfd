@@ -5,10 +5,9 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/cdialpha/pfd/internal/gen/accounts/v1" // Protobuf generated code package
-
 	"github.com/cdialpha/pfd/internal/accounts"
 	"github.com/cdialpha/pfd/internal/config"
+	pb "github.com/cdialpha/pfd/internal/gen/accounts/v1" // Protobuf generated code package
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 )

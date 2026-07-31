@@ -14,16 +14,89 @@ metadata:
   namespace: eg-system
   annotations: 
   - argocd.argoproj.io/sync-wave: "4"
-  - cert-manager.io/cluster-issuer: "cert-manager/cluster-ca-key-pair"
+  - cert-manager.io/cluster-issuer: "cert-manager/cluster-ca"
 spec:
   gatewayClassName: eg
   listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
     - name: https
       protocol: HTTPS
       port: 443
       tls:
         mode: Terminate
         certificateRefs:
-          - name: eg-tls
+          - name: eg-client-tls
             kind: Secret
 ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: ReferenceGrant
+metadata:
+  name: eg-refgrant
+  namespace: eg-system
+  annotations: {argocd.argoproj.io/sync-wave: "4"}
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      namespace: cert-manager
+      name: eg
+  to:
+    - group: ""
+      kind: Secret
+      name: eg-client-tls    
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: eg-http
+  namespace: eg-system
+  annotations: {argocd.argoproj.io/sync-wave: "4"}
+spec:
+  parentRefs:
+    - name: eg
+  rules:
+    - matches:  
+        path:
+          type: PathPrefix
+          value: /accounts
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-redirect
+  namespace: eg-system
+  annotations: {argocd.argoproj.io/sync-wave: "4"}
+spec:
+  parentRefs:
+    - name: eg
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: enable-mtls 
+  namespace: eg-system
+  annotations: {argocd.argoproj.io/sync-wave: "10"}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: eg
+  tls:
+    clientValidation:
+      caCertificateRefs:
+      - group:
+        kind: Secret
+        name: eg-client-ca
+        namespace: cert-manager

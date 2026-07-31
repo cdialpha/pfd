@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD_FILE: "/run/secrets/pg_pw"
+    env_file:
+      - .env
+    secrets:
+      - pg_pw
+    networks:
+      default:
+        aliases:
+          - psql.local
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./init:/docker-entrypoint-initdb.d
+      - ./../tls/server.crt:/var/lib/postgresql/data/server.crt:ro
+      - ./../tls/server.key:/var/lib/postgresql/data/server.key:ro
+      - ./../tls/ca.crt:/var/lib/postgresql/data/ca.crt:ro
+    command: > 
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c hba_file=/etc/postgresql/pg_hba.conf  
+volumes:
+  pgdata:  
+secrets:
+  pg_pw:
+    file: ./.secrets/pg_pw.txt 

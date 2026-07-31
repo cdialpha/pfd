@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh" 
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+source "$PROJECT_ROOT/scripts/lib.sh" 
 load_env 
 check_files 
-require kind kubectl helm cilium
+require kind kubectl helm cilium openssl
 # TO DO: Require specific version minimums? 
 
 echo "NET=[$KIND_NET] SUBNET=[$KIND_SUBNET] GW=[$KIND_GW]" >&2
@@ -20,7 +23,17 @@ else
     exit 1 
   fi 
 fi 
- 
+
+# Generate Certs 
+source "$PROJECT_ROOT/tls/setup_ca.sh"
+source "$PROJECT_ROOT/tls/generate_server_cert.sh"
+# don't need client cert, as cert-manager will generate later.
+# source "$PROJECT_ROOT/tls/generate_client_cert.sh" eg
+
+# Init DB
+docker compose up -f "$PROJECT_ROOT/deploy/docker-compose.yml" -d
+
+
 # Kind Cluster
 if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.yaml; then
     echo "✗ cluster init failed" >&2
@@ -31,18 +44,24 @@ if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.
 #  -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 # TO DO: figure out how to avoid CP_IP hardcoding. 
+#TO DO: Make sure generated secrets are git ignored. 
+
+kubectl create secret tls cluster-ca --cert="$PROJECT_ROOT/tls/ca.crt" --key="$PROJECT_ROOT/tls/ca.key" -n cert-manager
+
+#TO DO: Set up secrets encryption? 
 
 helm repo add cilium https://helm.cilium.io/
 helm repo add argo https://argoproj.github.io/argo-helm
-helm repo add jetstack https://charts.jetstack.io 
 helm repo update
-
+ 
 helm install cilium cilium/cilium \
       --namespace kube-system \
       --set kubeProxyReplacement=true \
       --set k8sServiceHost=auto \
       --set k8sServicePort=6443 \
       --set l2announcements.enabled=true
+
+# TO DO: vendor cilium crds?
 
 # wait on cilium agent (DS; dataplane) & operator AVAILABLE (>=1), tolerating 1/2 pending quirk:
 kubectl -n kube-system rollout status ds/cilium --timeout=300s
@@ -51,17 +70,5 @@ kubectl -n kube-system wait deploy/cilium-operator --for=condition=Available --t
 helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 kubectl apply -f bootstrap/root-app.yaml
 
-
-# TO DO init Network Infra w/ IaC tool ? 
-
-# Add API GW 
-
-
-# TO DO Helm Install Accounts Chart from 
-    # charts/accoutns? Or chart repo? 
-
-
-
-# App manifests / Helm
-# helm upgrade --install myapp ./charts/myapp
+# TO DO: init Network Infra w/ IaC tool ? 
 

@@ -34,9 +34,7 @@ cainjector:
 installCRDs: false
 
 # Envoy GW config
-# config.enableGatewayAPI:true
-
-
+config.enableGatewayAPI: true
 
 # DNS01 solver configuration for cloud providers
 # Uncomment for AWS Route53
