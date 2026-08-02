@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DEPLOY_DIR="$PWD" 
 
-source "$PROJECT_ROOT/scripts/lib.sh" 
+source "$PROJECT_ROOT/deploy/scripts/lib.sh" 
 load_env 
 check_files 
 require kind kubectl helm cilium openssl
@@ -25,20 +25,19 @@ else
 fi 
 
 # Generate Certs 
-source "$PROJECT_ROOT/tls/setup_ca.sh"
-source "$PROJECT_ROOT/tls/generate_server_cert.sh"
+source "$PROJECT_ROOT/deploy/scripts/tls/setup_ca.sh"
+source "$PROJECT_ROOT/deploy/scripts/tls/generate_server_cert.sh"
 # don't need client cert, as cert-manager will generate later.
-# source "$PROJECT_ROOT/tls/generate_client_cert.sh" eg
+# source "$PROJECT_ROOT/deploy/scripts/tls/generate_client_cert.sh" eg
 
 # Init DB
-docker compose up -f "$PROJECT_ROOT/deploy/docker-compose.yml" -d
+docker compose -f "$PROJECT_ROOT/deploy/db/docker-compose.yaml" up -d
 
-
-# Kind Cluster
-if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.yaml; then
+# Kind Cluster - add --quiet to supress output. 
+if ! kind create cluster --name "$CLUSTER_NAME" --config cluster-config.yaml; then
     echo "✗ cluster init failed" >&2
     exit 1
-  fi
+fi
 
 # CP_IP=$(kubectl get node -l node-role.kubernetes.io/control-plane='' \
 #  -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
@@ -46,14 +45,14 @@ if ! kind create cluster --quiet --name "$CLUSTER_NAME" --config cluster-config.
 # TO DO: figure out how to avoid CP_IP hardcoding. 
 #TO DO: Make sure generated secrets are git ignored. 
 
-kubectl create secret tls cluster-ca --cert="$PROJECT_ROOT/tls/ca.crt" --key="$PROJECT_ROOT/tls/ca.key" -n cert-manager
+kubectl create secret tls cluster-ca --cert="$DEPLOY_DIR/tls/ca/ca.crt" --key="$DEPLOY_DIR/tls/ca/ca.key" -n cert-manager
 
 #TO DO: Set up secrets encryption? 
 
 helm repo add cilium https://helm.cilium.io/
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
- 
+
 helm install cilium cilium/cilium \
       --namespace kube-system \
       --set kubeProxyReplacement=true \

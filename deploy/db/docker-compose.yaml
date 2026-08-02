@@ -20,12 +20,11 @@ services:
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
       - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./init:/docker-entrypoint-initdb.d
-      - ./../tls/server.crt:/var/lib/postgresql/data/server.crt:ro
-      - ./../tls/server.key:/var/lib/postgresql/data/server.key:ro
-      - ./../tls/ca.crt:/var/lib/postgresql/data/ca.crt:ro
+      - ./../tls:/etc/postgresql/tls:ro
     command: > 
+      postgres
       -c config_file=/etc/postgresql/postgresql.conf
-      -c hba_file=/etc/postgresql/pg_hba.conf  
+      -c hba_file=/etc/postgresql/pg_hba.conf
 volumes:
   pgdata:  
 secrets:

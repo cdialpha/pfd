@@ -42,9 +42,13 @@ openssl ca -batch \
     -days 365 \
     -notext
 
+# check if user postgres exists, if not create it
+id postgres &>/dev/null || sudo useradd -s /bin/bash -u 999 postgres
 # Set ownership for PostgreSQL
-chown postgres:postgres server.key server.crt
 chmod 600 server.key
 chmod 644 server.crt
+sudo chown postgres:postgres server.key server.crt
 
 echo "Server certificate created at ${SERVER_DIR}/server.crt"
+
+cd "${DEPLOY_DIR}"

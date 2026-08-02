@@ -2,9 +2,10 @@
 
 set -eo pipefail # exit on error, and fail if any command in a pipeline fails
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-cd "$PROJECT_ROOT"
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# cd "$PROJECT_ROOT"
+
 # echo "pwd: $(pwd), script dir: $SCRIPT_DIR, project root: $PROJECT_ROOT"
 
 # env vars - load from .env or .env.example if exists, don't fail if missing
