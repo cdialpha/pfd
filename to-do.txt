@@ -1,0 +1,3 @@
+- Remove sudo from script for CA gen / mTLS setup 
+- Remove bind mounts from postgreql docker image
+- For postgresql docker image, determine if crt & keys must be mounted as :ro 

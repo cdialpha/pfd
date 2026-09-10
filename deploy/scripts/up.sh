@@ -30,7 +30,7 @@ source "$PROJECT_ROOT/deploy/scripts/tls/generate_server_cert.sh"
 # don't need client cert, as cert-manager will generate later.
 # source "$PROJECT_ROOT/deploy/scripts/tls/generate_client_cert.sh" eg
 
-# Init DB
+# DeployDB
 docker compose -f "$PROJECT_ROOT/deploy/db/docker-compose.yaml" up -d
 
 # Kind Cluster - add --quiet to supress output. 
@@ -45,6 +45,7 @@ fi
 # TO DO: figure out how to avoid CP_IP hardcoding. 
 #TO DO: Make sure generated secrets are git ignored. 
 
+kubectl create namespace cert-manager
 kubectl create secret tls cluster-ca --cert="$DEPLOY_DIR/tls/ca/ca.crt" --key="$DEPLOY_DIR/tls/ca/ca.key" -n cert-manager
 
 #TO DO: Set up secrets encryption? 

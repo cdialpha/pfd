@@ -33,6 +33,9 @@ go.work.sum
 .env
 secrets/
 
+deploy/tls
+
+
 # Editor/IDE
 # .idea/
 # .vscode/secrets/

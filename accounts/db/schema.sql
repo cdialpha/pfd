@@ -1,0 +1,13 @@
+CREATE SCHEMA accounts
+
+CREATE ROLE eg LOGIN;
+GRANT CONNECT ON DATABASE pfd-db TO eg;
+
+-- CREATE SCHEMA app AUTHORIZATION eg;
+
+CREATE TABLE accounts (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name text NOT NULL,
+    email text NOT NULL UNIQUE,
+);
+
