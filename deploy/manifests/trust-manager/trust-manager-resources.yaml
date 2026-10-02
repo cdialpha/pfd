@@ -5,7 +5,7 @@ metadata:
 spec:
   sources:
     - secret:
-        name: internal-ca
+        name: cluster-ca
         key: tls.crt
   target:
     configMap:

@@ -98,5 +98,5 @@ spec:
       caCertificateRefs:
       - group:
         kind: Secret
-        name: eg-client-ca
+        name: eg-client-tls
         namespace: cert-manager
