@@ -1,0 +1,6 @@
+[tools]
+helm = "4.2.2"
+kind = "0.27"
+kubectl = "1.36"
+docker-cli = "29"
+shellcheck = "0.11.0"
