@@ -7,6 +7,12 @@ metadata:
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eg-system
+  annotations: {argocd.argoproj.io/sync-wave: "1"}
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
