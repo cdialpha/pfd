@@ -8,13 +8,13 @@ metadata:
 spec:
   project: default
   source:
-      repoURL: https://github.com/cdialpha/pfd/
-      path: deploy/manifests/envoy-gateway
-      targetRevision: dev
-      directory:
-        recurse: true
-        # include: "*.yaml"
-        # exlucde: "{kustomization.yaml, *.md}"
+    repoURL: https://github.com/cdialpha/pfd/
+    path: deploy/manifests/envoy-gateway
+    targetRevision: dev
+    directory:
+      recurse: true
+      # include: "*.yaml"
+      # exlucde: "{kustomization.yaml, *.md}"
   destination:
     server: https://kubernetes.default.svc
     namespace: envoy-gateway-system
