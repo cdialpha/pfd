@@ -13,8 +13,8 @@ metadata:
   name: eg
   namespace: eg-system
   annotations: 
-  - argocd.argoproj.io/sync-wave: "4"
-  - cert-manager.io/cluster-issuer: "cert-manager/cluster-ca"
+    argocd.argoproj.io/sync-wave: "4"
+    cert-manager.io/cluster-issuer: "cert-manager/cluster-ca"
 spec:
   gatewayClassName: eg
   listeners:
