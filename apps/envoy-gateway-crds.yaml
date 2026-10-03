@@ -11,6 +11,14 @@ spec:
     repoURL: oci://docker.io/envoyproxy/gateway-crds-helm
     targetRevision: v1.9.2
     chart: gateway-crds
+    helm:
+      valuesObject:
+        crds:
+          gatewayAPI:
+            enabled: true
+            channel: standard   # δ experimental, pick deliberately
+          envoyGateway:
+            enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: envoy-gateway-system
