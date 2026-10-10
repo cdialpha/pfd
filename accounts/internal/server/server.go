@@ -27,6 +27,8 @@ func Run(
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
+	ready := &Ready{}
+
 	cfg, err := config.Load(getenv)
 	if err != nil {
 		return err
@@ -38,8 +40,9 @@ func Run(
 	if err != nil {
 		return err
 	}
+	ready.Connected.Store(true)
 
-	srv := NewServer(logger, cfg, acctStore)
+	srv := NewServer(logger, cfg, acctStore, ready)
 
 	httpServer := &http.Server{
 		Addr:              net.JoinHostPort(cfg.Host, cfg.Port),
@@ -79,9 +82,10 @@ func NewServer(
 	logger *slog.Logger,
 	cfg config.Config,
 	accountStore accountStore,
+	ready *Ready,
 ) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(mux, logger, cfg, accountStore)
+	addRoutes(mux, logger, cfg, accountStore, ready)
 	var handler http.Handler = mux
 	logmw := NewLoggingMiddleware(logger)
 	handler = logmw(handler)

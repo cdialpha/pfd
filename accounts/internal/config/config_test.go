@@ -1,7 +1,7 @@
 package config
 
 import (
-	"_/home/calvin/code/pfd/accounts-http/internal/config"
+	"_/home/calvin/code/pfd/accounts/internal/config"
 	"testing"
 	"time"
 )

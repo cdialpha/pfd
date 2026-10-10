@@ -13,9 +13,10 @@ func addRoutes(
 	logger *slog.Logger,
 	cfg config.Config,
 	accountStore accountStore,
+	ready *Ready,
 ) {
-	mux.Handle("GET /healthz", handleHealth(logger))
-	mux.Handle("GET /readyz", handleReady(logger))
+	mux.Handle("GET /healthz", handleHealth())
+	mux.Handle("GET /readyz", handleReady(logger, ready))
 	mux.Handle("GET /accounts/v1/{id}", handleGetAccount(logger))
 	mux.Handle("/", http.NotFoundHandler())
 	// add routes
